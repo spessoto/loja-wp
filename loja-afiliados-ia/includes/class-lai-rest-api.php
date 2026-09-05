@@ -86,6 +86,13 @@ class LAI_REST_API {
 	public function importar( WP_REST_Request $request ) {
 		$data = $request->get_json_params();
 		if ( ! is_array( $data ) ) {
+			$data = LAI_Importer::decode_json_colado( $request->get_body() );
+		}
+		if ( is_wp_error( $data ) ) {
+			$data->add_data( array( 'status' => 400 ) );
+			return $data;
+		}
+		if ( ! is_array( $data ) ) {
 			return new WP_Error( 'lai_json_invalido', __( 'Corpo da requisição precisa ser um JSON válido.', 'loja-afiliados-ia' ), array( 'status' => 400 ) );
 		}
 

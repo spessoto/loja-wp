@@ -18,6 +18,37 @@ require_once ABSPATH . 'wp-admin/includes/image.php';
 class LAI_Importer {
 
 	/**
+	 * Decodes the JSON text pasted into the admin screen. Tolerates the most
+	 * common copy/paste mistakes: a leading/trailing ```json code fence, a
+	 * UTF-8 BOM, or extra blank lines around the object.
+	 *
+	 * @return array|WP_Error
+	 */
+	public static function decode_json_colado( $texto ) {
+		$texto = (string) $texto;
+		$texto = preg_replace( '/^\xEF\xBB\xBF/', '', $texto ); // BOM.
+		$texto = trim( $texto );
+		$texto = preg_replace( '/^```[a-zA-Z]*\s*/', '', $texto );
+		$texto = preg_replace( '/```\s*$/', '', $texto );
+		$texto = trim( $texto );
+
+		$data = json_decode( $texto, true );
+
+		if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $data ) ) {
+			return new WP_Error(
+				'lai_json_invalido',
+				sprintf(
+					/* translators: %s: PHP JSON error message */
+					__( 'JSON inválido: %s. Confira se colou só o conteúdo entre chaves { } (sem texto antes/depois e sem as cercas de código ```) e se todas as aspas são retas ("), não curvas (" ").', 'loja-afiliados-ia' ),
+					json_last_error_msg()
+				)
+			);
+		}
+
+		return $data;
+	}
+
+	/**
 	 * @param array $data   Decoded JSON payload (see admin import page for the schema).
 	 * @param int   $post_id Existing product ID to update, or 0 to create a new one.
 	 * @return int|WP_Error Post ID on success.

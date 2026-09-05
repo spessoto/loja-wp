@@ -31,13 +31,8 @@ class LAI_Admin_Import_Page {
 
 		$result = null;
 		if ( isset( $_POST['lai_import_json'] ) && check_admin_referer( 'lai_import' ) ) {
-			$json = wp_unslash( $_POST['lai_import_json'] );
-			$data = json_decode( $json, true );
-			if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $data ) ) {
-				$result = new WP_Error( 'lai_json_invalido', __( 'JSON inválido. Revise o texto colado.', 'loja-afiliados-ia' ) );
-			} else {
-				$result = LAI_Importer::import( $data );
-			}
+			$data = LAI_Importer::decode_json_colado( wp_unslash( $_POST['lai_import_json'] ) );
+			$result = is_wp_error( $data ) ? $data : LAI_Importer::import( $data );
 		}
 
 		$schema_example = wp_json_encode(

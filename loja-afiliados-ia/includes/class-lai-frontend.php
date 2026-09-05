@@ -10,7 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class LAI_Frontend {
 
 	public function __construct() {
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+		// Priority 20: loads after the theme's own stylesheet so our button/badge
+		// colors aren't silently overridden by same-specificity theme rules.
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ), 20 );
 		add_filter( 'template_include', array( $this, 'template_include' ) );
 		add_action( 'pre_get_posts', array( $this, 'filtrar_loja_por_get' ) );
 	}

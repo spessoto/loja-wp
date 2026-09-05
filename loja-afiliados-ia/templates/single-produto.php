@@ -52,23 +52,25 @@ while ( have_posts() ) :
 
 			<div class="lai-produto__galeria">
 				<?php if ( $badge ) : ?><span class="lai-badge lai-badge--selo"><?php echo esc_html( strtoupper( $badge ) ); ?></span><?php endif; ?>
-				<?php if ( $desconto > 0 ) : ?><span class="lai-badge lai-badge--desconto"><?php echo esc_html( $desconto ); ?>%</span><?php endif; ?>
+				<?php if ( $desconto > 0 ) : ?><span class="lai-badge lai-badge--desconto">-<?php echo esc_html( $desconto ); ?>%</span><?php endif; ?>
 
-				<div class="lai-galeria__principal" id="lai-galeria-principal">
-					<?php if ( ! empty( $galeria ) ) : ?>
-						<?php echo LAI_Frontend::media_principal_html( $galeria[0] ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-					<?php else : ?>
-						<div class="lai-galeria__placeholder"><?php esc_html_e( 'Sem imagem', 'loja-afiliados-ia' ); ?></div>
+				<div class="lai-galeria__corpo">
+					<?php if ( count( $galeria ) > 1 ) : ?>
+						<div class="lai-galeria__miniaturas">
+							<?php foreach ( $galeria as $i => $att_id ) : ?>
+								<?php echo LAI_Frontend::media_thumb_html( $att_id, 0 === $i ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+							<?php endforeach; ?>
+						</div>
 					<?php endif; ?>
-				</div>
 
-				<?php if ( count( $galeria ) > 1 ) : ?>
-					<div class="lai-galeria__miniaturas">
-						<?php foreach ( $galeria as $i => $att_id ) : ?>
-							<?php echo LAI_Frontend::media_thumb_html( $att_id, 0 === $i ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-						<?php endforeach; ?>
+					<div class="lai-galeria__principal" id="lai-galeria-principal">
+						<?php if ( ! empty( $galeria ) ) : ?>
+							<?php echo LAI_Frontend::media_principal_html( $galeria[0] ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+						<?php else : ?>
+							<div class="lai-galeria__placeholder"><?php esc_html_e( 'Sem imagem', 'loja-afiliados-ia' ); ?></div>
+						<?php endif; ?>
 					</div>
-				<?php endif; ?>
+				</div>
 
 				<?php if ( $bullets ) : ?>
 					<ul class="lai-bullets">

@@ -84,8 +84,9 @@ class LAI_Admin_Import_Page {
 				<p>
 					<strong><?php esc_html_e( 'Como funciona (sem gastar API):', 'loja-afiliados-ia' ); ?></strong><br>
 					<?php esc_html_e( '1. Copie o link de afiliado do produto (Amazon, Mercado Livre, etc).', 'loja-afiliados-ia' ); ?><br>
-					<?php esc_html_e( '2. Cole o link em uma conversa com o Claude (app/site do seu plano pago) e peça para ele ler a página e devolver os dados no formato JSON abaixo.', 'loja-afiliados-ia' ); ?><br>
-					<?php esc_html_e( '3. Cole o JSON gerado no campo abaixo e clique em Importar. As imagens são baixadas automaticamente para a biblioteca de mídia.', 'loja-afiliados-ia' ); ?>
+					<?php esc_html_e( '2. Cole o link (ou anexe um print da página) em uma conversa com o Claude (app/site do seu plano pago) e peça para ele ler e devolver os dados no formato JSON abaixo.', 'loja-afiliados-ia' ); ?><br>
+					<?php esc_html_e( '3. Cole o JSON gerado no campo abaixo e clique em Importar. Quando a IA lê um link, as imagens são baixadas automaticamente; quando você usa um print, adicione as fotos manualmente depois na Galeria de imagens.', 'loja-afiliados-ia' ); ?><br>
+					<?php esc_html_e( 'Dica: use o arquivo PROMPT-IMPORTACAO.md (na pasta do plugin) como modelo de pedido pronto para quando for importar a partir de um print.', 'loja-afiliados-ia' ); ?>
 				</p>
 			</div>
 

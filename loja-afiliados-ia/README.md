@@ -23,6 +23,10 @@ Plugin WordPress para montar uma vitrine de produtos de afiliado (Amazon, Mercad
 3. Cole o JSON que o Claude devolveu no campo da tela **Produtos → Importar com IA** e clique em **Importar produto**.
 4. O plugin cria o produto, baixa as imagens para a biblioteca de mídia e preenche preço, ficha técnica, avaliações etc. Revise e ajuste manualmente o que quiser na tela normal de edição do produto.
 
+### Importando a partir de um print (sem o link acessível à IA)
+
+Se preferir tirar um print da página do produto em vez de pedir para a IA abrir o link, use o prompt pronto em [`PROMPT-IMPORTACAO.md`](PROMPT-IMPORTACAO.md): anexe o(s) print(s) na conversa com o Claude, cole o prompt, e ele devolve o mesmo JSON no formato esperado por esta tela. Nesse caso as imagens não são baixadas automaticamente (o print não tem URLs) — adicione as fotos do produto manualmente depois, no meta box **Galeria de imagens**.
+
 ### Automatizando com um agente (avançado)
 
 Existe também o endpoint REST `POST /wp-json/loja-afiliados-ia/v1/importar`, que aceita o mesmo JSON no corpo da requisição (autenticado como usuário com permissão de editor). Isso permite que uma ferramenta de agente (ex.: MCP do WordPress) publique o produto diretamente, sem passar pela tela de admin.

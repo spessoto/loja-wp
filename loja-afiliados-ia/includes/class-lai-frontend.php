@@ -93,4 +93,57 @@ class LAI_Frontend {
 	public static function formatar_preco( $valor ) {
 		return 'R$ ' . number_format( (float) $valor, 2, ',', '.' );
 	}
+
+	/**
+	 * Renders the main media slot (large photo or playable video) for a
+	 * gallery item, used as the initial state of #lai-galeria-principal
+	 * before assets/js/frontend.js takes over on thumbnail clicks.
+	 */
+	public static function media_principal_html( $attachment_id ) {
+		if ( wp_attachment_is( 'video', $attachment_id ) ) {
+			return sprintf(
+				'<video src="%s" controls playsinline></video>',
+				esc_url( wp_get_attachment_url( $attachment_id ) )
+			);
+		}
+		return wp_get_attachment_image( $attachment_id, 'large' );
+	}
+
+	/**
+	 * First photo (not video) in a gallery ID list, used wherever only a
+	 * still image makes sense (e.g. the sticky bottom bar thumbnail).
+	 */
+	public static function primeira_imagem_da_galeria( $galeria ) {
+		foreach ( (array) $galeria as $attachment_id ) {
+			if ( ! wp_attachment_is( 'video', $attachment_id ) ) {
+				return (int) $attachment_id;
+			}
+		}
+		return 0;
+	}
+
+	/**
+	 * Renders one gallery thumbnail button, tagged with the data attributes
+	 * assets/js/frontend.js reads to swap the main media slot.
+	 */
+	public static function media_thumb_html( $attachment_id, $ativa = false ) {
+		$is_video = wp_attachment_is( 'video', $attachment_id );
+		$url      = $is_video ? wp_get_attachment_url( $attachment_id ) : wp_get_attachment_image_url( $attachment_id, 'large' );
+
+		if ( $is_video ) {
+			$thumb_id = get_post_thumbnail_id( $attachment_id );
+			$conteudo = $thumb_id ? wp_get_attachment_image( $thumb_id, 'thumbnail' ) : '';
+			$conteudo .= '<span class="lai-galeria__video-icone">►</span>';
+		} else {
+			$conteudo = wp_get_attachment_image( $attachment_id, 'thumbnail' );
+		}
+
+		return sprintf(
+			'<button type="button" class="lai-galeria__thumb%1$s" data-tipo="%2$s" data-full="%3$s">%4$s</button>',
+			$ativa ? ' is-ativa' : '',
+			esc_attr( $is_video ? 'video' : 'imagem' ),
+			esc_url( $url ),
+			$conteudo
+		);
+	}
 }

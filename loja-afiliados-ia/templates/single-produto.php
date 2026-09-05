@@ -56,7 +56,7 @@ while ( have_posts() ) :
 
 				<div class="lai-galeria__principal" id="lai-galeria-principal">
 					<?php if ( ! empty( $galeria ) ) : ?>
-						<?php echo wp_get_attachment_image( $galeria[0], 'large', false, array( 'id' => 'lai-imagem-principal' ) ); ?>
+						<?php echo LAI_Frontend::media_principal_html( $galeria[0] ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 					<?php else : ?>
 						<div class="lai-galeria__placeholder"><?php esc_html_e( 'Sem imagem', 'loja-afiliados-ia' ); ?></div>
 					<?php endif; ?>
@@ -65,9 +65,7 @@ while ( have_posts() ) :
 				<?php if ( count( $galeria ) > 1 ) : ?>
 					<div class="lai-galeria__miniaturas">
 						<?php foreach ( $galeria as $i => $att_id ) : ?>
-							<button type="button" class="lai-galeria__thumb <?php echo 0 === $i ? 'is-ativa' : ''; ?>" data-full="<?php echo esc_url( wp_get_attachment_image_url( $att_id, 'large' ) ); ?>">
-								<?php echo wp_get_attachment_image( $att_id, 'thumbnail' ); ?>
-							</button>
+							<?php echo LAI_Frontend::media_thumb_html( $att_id, 0 === $i ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 						<?php endforeach; ?>
 					</div>
 				<?php endif; ?>
@@ -223,7 +221,8 @@ while ( have_posts() ) :
 
 	<div class="lai-barra-fixa">
 		<div class="lai-barra-fixa__produto">
-			<?php if ( ! empty( $galeria ) ) : ?><?php echo wp_get_attachment_image( $galeria[0], 'thumbnail' ); ?><?php endif; ?>
+			<?php $imagem_barra = LAI_Frontend::primeira_imagem_da_galeria( $galeria ); ?>
+			<?php if ( $imagem_barra ) : ?><?php echo wp_get_attachment_image( $imagem_barra, 'thumbnail' ); ?><?php endif; ?>
 			<div>
 				<p class="lai-barra-fixa__titulo"><?php the_title(); ?></p>
 				<p class="lai-barra-fixa__preco"><?php echo LAI_Frontend::formatar_preco( $preco ); ?></p>

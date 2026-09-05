@@ -97,15 +97,20 @@
 		} );
 	}
 
-	/** Galeria de miniaturas na página de produto. */
+	/** Galeria de miniaturas (fotos e vídeos) na página de produto. */
 	function bindGaleria() {
 		document.querySelectorAll( '.lai-galeria__thumb' ).forEach( function ( thumb ) {
 			thumb.addEventListener( 'click', function () {
+				var tipo = thumb.getAttribute( 'data-tipo' );
 				var full = thumb.getAttribute( 'data-full' );
-				var principal = document.getElementById( 'lai-imagem-principal' );
+				var principal = document.getElementById( 'lai-galeria-principal' );
+
 				if ( full && principal ) {
-					principal.src = full;
+					principal.innerHTML = 'video' === tipo ?
+						'<video src="' + full + '" controls playsinline></video>' :
+						'<img src="' + full + '" alt="">';
 				}
+
 				document.querySelectorAll( '.lai-galeria__thumb' ).forEach( function ( t ) {
 					t.classList.remove( 'is-ativa' );
 				} );

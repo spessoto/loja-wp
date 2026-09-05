@@ -118,12 +118,23 @@
 	justify-content: center;
 	overflow: hidden;
 }
-.lai-galeria__principal img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.lai-galeria__principal img,
+.lai-galeria__principal video { max-width: 100%; max-height: 100%; object-fit: contain; }
 .lai-galeria__placeholder { color: #a0aec0; }
 .lai-galeria__miniaturas { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-.lai-galeria__thumb { padding: 0; border: 2px solid var(--lai-cinza-borda); border-radius: 8px; background: #fff; cursor: pointer; overflow: hidden; width: 60px; height: 60px; }
+.lai-galeria__thumb { position: relative; padding: 0; border: 2px solid var(--lai-cinza-borda); border-radius: 8px; background: #fff; cursor: pointer; overflow: hidden; width: 60px; height: 60px; }
 .lai-galeria__thumb img { width: 100%; height: 100%; object-fit: cover; }
 .lai-galeria__thumb.is-ativa { border-color: var(--lai-laranja); }
+.lai-galeria__video-icone {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(11, 37, 64, 0.45);
+	color: #fff;
+	font-size: 14px;
+}
 
 .lai-bullets { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--lai-cinza-texto); }
 .lai-bullets li { color: var(--lai-verde); }

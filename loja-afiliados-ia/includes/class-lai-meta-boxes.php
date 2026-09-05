@@ -16,6 +16,28 @@ class LAI_Meta_Boxes {
 	public function __construct() {
 		add_action( 'add_meta_boxes', array( $this, 'add_boxes' ) );
 		add_action( 'save_post_' . LAI_CPT, array( $this, 'save' ), 10, 2 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
+	}
+
+	public function enqueue_admin_assets( $hook ) {
+		if ( ! in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
+			return;
+		}
+		if ( LAI_CPT !== get_current_screen()->post_type ) {
+			return;
+		}
+
+		wp_enqueue_media();
+		wp_enqueue_style( 'lai-admin', LAI_PLUGIN_URL . 'assets/css/admin.css', array(), LAI_VERSION );
+		wp_enqueue_script( 'lai-admin', LAI_PLUGIN_URL . 'assets/js/admin.js', array( 'jquery' ), LAI_VERSION, true );
+		wp_localize_script(
+			'lai-admin',
+			'LAI_ADMIN',
+			array(
+				'tituloSeletor' => __( 'Selecionar imagens ou vídeos do produto', 'loja-afiliados-ia' ),
+				'botaoSeletor'  => __( 'Usar selecionado(s)', 'loja-afiliados-ia' ),
+			)
+		);
 	}
 
 	public function add_boxes() {
@@ -24,7 +46,7 @@ class LAI_Meta_Boxes {
 		add_meta_box( 'lai_especificacoes', __( 'Ficha técnica', 'loja-afiliados-ia' ), array( $this, 'render_especificacoes' ), LAI_CPT, 'normal' );
 		add_meta_box( 'lai_publico', __( 'Para quem é / não é', 'loja-afiliados-ia' ), array( $this, 'render_publico' ), LAI_CPT, 'normal' );
 		add_meta_box( 'lai_avaliacoes', __( 'Avaliações de clientes', 'loja-afiliados-ia' ), array( $this, 'render_avaliacoes' ), LAI_CPT, 'normal' );
-		add_meta_box( 'lai_galeria', __( 'Galeria de imagens', 'loja-afiliados-ia' ), array( $this, 'render_galeria' ), LAI_CPT, 'side' );
+		add_meta_box( 'lai_galeria', __( 'Galeria de imagens e vídeos', 'loja-afiliados-ia' ), array( $this, 'render_galeria' ), LAI_CPT, 'side' );
 	}
 
 	private function nonce_field() {
@@ -157,15 +179,37 @@ class LAI_Meta_Boxes {
 	public function render_galeria( $post ) {
 		$ids = array_filter( array_map( 'intval', (array) get_post_meta( $post->ID, '_lai_galeria', true ) ) );
 		?>
-		<p><?php esc_html_e( 'IDs de mídia (um por linha) ou use o botão para escolher da biblioteca de mídia.', 'loja-afiliados-ia' ); ?></p>
-		<div id="lai-galeria-preview" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
-			<?php foreach ( $ids as $id ) : ?>
-				<?php echo wp_get_attachment_image( $id, array( 60, 60 ) ); ?>
-			<?php endforeach; ?>
+		<p><?php esc_html_e( 'Adicione fotos e vídeos do produto. O primeiro item é usado como imagem principal (se for uma foto).', 'loja-afiliados-ia' ); ?></p>
+		<div class="lai-media-manager">
+			<ul class="lai-media-lista" id="lai-galeria-lista">
+				<?php foreach ( $ids as $id ) : ?>
+					<?php echo self::media_item_html( $id ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+				<?php endforeach; ?>
+			</ul>
+			<button type="button" class="button lai-media-adicionar"><?php esc_html_e( 'Adicionar imagens/vídeos', 'loja-afiliados-ia' ); ?></button>
+			<input type="hidden" name="lai_galeria" id="lai-galeria-ids" value="<?php echo esc_attr( implode( ',', $ids ) ); ?>">
 		</div>
-		<textarea name="lai_galeria" rows="4" class="large-text code"><?php echo esc_textarea( implode( "\n", $ids ) ); ?></textarea>
-		<p class="description"><?php esc_html_e( 'Dica: ao importar via IA as imagens são baixadas e anexadas automaticamente.', 'loja-afiliados-ia' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Dica: ao importar via IA as imagens são baixadas e anexadas automaticamente; vídeos precisam ser adicionados aqui manualmente.', 'loja-afiliados-ia' ); ?></p>
 		<?php
+	}
+
+	/**
+	 * Markup for one item of the media manager (used on initial render and
+	 * mirrored in assets/js/admin.js when a new item is picked).
+	 */
+	public static function media_item_html( $id ) {
+		$is_video = wp_attachment_is( 'video', $id );
+		if ( $is_video ) {
+			$thumb = '<span class="lai-media-item__video-icone dashicons dashicons-video-alt3"></span>';
+		} else {
+			$thumb = wp_get_attachment_image( $id, array( 60, 60 ) );
+		}
+		return sprintf(
+			'<li class="lai-media-item" data-id="%1$d"><div class="lai-media-item__thumb">%2$s</div><button type="button" class="lai-media-item__remover" aria-label="%3$s">&times;</button></li>',
+			$id,
+			$thumb,
+			esc_attr__( 'Remover', 'loja-afiliados-ia' )
+		);
 	}
 
 	public function save( $post_id, $post ) {
@@ -233,7 +277,7 @@ class LAI_Meta_Boxes {
 		}
 
 		if ( isset( $_POST['lai_galeria'] ) ) {
-			$ids = array_filter( array_map( 'intval', preg_split( '/\s+/', wp_unslash( $_POST['lai_galeria'] ) ) ) );
+			$ids = array_filter( array_map( 'intval', explode( ',', wp_unslash( $_POST['lai_galeria'] ) ) ) );
 			update_post_meta( $post_id, '_lai_galeria', array_values( $ids ) );
 		}
 	}
